@@ -2616,9 +2616,10 @@ public class Workspace extends PagedView
         if (d.dragSource != this) {
             final int[] touchXY = new int[] { (int) mDragViewVisualCenter[0],
                     (int) mDragViewVisualCenter[1] };
-            android.util.Log.e("gaokaidong","drag from all apps");
+            android.util.Log.e("gaokaidong","drag from all apps or Folder");
             onDropExternal(touchXY, d.dragInfo, dropTargetLayout, false, d);
         } else if (mDragInfo != null) {
+            android.util.Log.e("gaokaidong","drag from workspace");
             final View cell = mDragInfo.cell;
 
             Runnable resizeRunnable = null;
@@ -2644,11 +2645,11 @@ public class Workspace extends PagedView
                 // If the item being dropped is a shortcut and the nearest drop
                 // cell also contains a shortcut, then create a folder with the two shortcuts.
                 if (!mInScrollArea && createUserFolderIfNecessary(cell, container,
-                        dropTargetLayout, mTargetCell, distance, false, d.dragView, null)) {
+                        dropTargetLayout, mTargetCell, distance, false, d.dragView, null)) {   //create folder  add by gaokaidong
                     return;
                 }
 
-                if (addToExistingFolderIfNecessary(cell, dropTargetLayout, mTargetCell,
+                if (addToExistingFolderIfNecessary(cell, dropTargetLayout, mTargetCell,     //add to Foler add by gaokaidong
                         distance, d, false)) {
                     return;
                 }
@@ -2696,6 +2697,8 @@ public class Workspace extends PagedView
                         } else if (LauncherAppState.isDogfoodBuild()) {
                             throw new NullPointerException("mDragInfo.cell has null parent");
                         }
+                        android.util.Log.e("gaokaidong","drop from hotseat,add to workspace");
+                        //cell = mLauncher.createCustomShortcut(dropTargetLayout, (ShortcutInfo) info);
                         addInScreen(cell, container, screenId, mTargetCell[0], mTargetCell[1],
                                 info.spanX, info.spanY);
                     }
@@ -3520,11 +3523,7 @@ public class Workspace extends PagedView
                     // Came from all apps -- make a copy
                     info = ((AppInfo) info).makeShortcut();
                 }
-                if(mLauncher.isHotseatLayout(cellLayout)){
-                    view = mLauncher.createShortcut(cellLayout, (ShortcutInfo) info);
-                }else{
-                    view = mLauncher.createCustomShortcut(cellLayout, (ShortcutInfo) info);  //modify by gaokaidong @20180411
-                }
+                view = mLauncher.createCustomShortcut(cellLayout, (ShortcutInfo) info);  //modify by gaokaidong @20180414
                 
                 break;
             case LauncherSettings.Favorites.ITEM_TYPE_FOLDER:

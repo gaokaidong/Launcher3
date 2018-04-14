@@ -1620,6 +1620,9 @@ public class Launcher extends Activity
         favorite.setCompoundDrawablePadding(mDeviceProfile.iconDrawablePaddingPx);
         favorite.setOnClickListener(this);
         favorite.setOnFocusChangeListener(mFocusHandler);
+        if(info.container == LauncherSettings.Favorites.CONTAINER_HOTSEAT){
+            testview.setImageVisible();
+        }
         return testview;
 
     }
@@ -3921,14 +3924,14 @@ public class Launcher extends Activity
                 case LauncherSettings.Favorites.ITEM_TYPE_APPLICATION:
                 case LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT:  
                     ShortcutInfo info = (ShortcutInfo) item;
-
+                    view = createCustomShortcut(info);  //gaokaidong  modify 20180409
                     
 
                     /*
                      * TODO: FIX collision case
                      */
                     if (item.container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
-                        view = createCustomShortcut(info);  //gaokaidong  modify 20180409
+                        
                         CellLayout cl = mWorkspace.getScreenWithId(item.screenId);
                         if (cl != null && cl.isOccupied(item.cellX, item.cellY)) {
                             View v = cl.getChildAt(item.cellX, item.cellY);
@@ -3941,8 +3944,6 @@ public class Launcher extends Activity
                                 Log.d(TAG, desc);
                             }
                         }
-                    } else{
-                        view = createShortcut(info);
                     }
                     break;
                 case LauncherSettings.Favorites.ITEM_TYPE_FOLDER:

@@ -46,6 +46,10 @@ public class TestView extends LinearLayout implements BaseRecyclerViewFastScroll
         	return bubbleChild;
 	}
 
+    public void setImageVisible(){
+        imageview.setVisibility(View.INVISIBLE);
+    }
+
 	public void applyFromShortcutInfo(ShortcutInfo info, IconCache iconCache){
 		bubbleChild.applyFromShortcutInfo(info,iconCache);
 	}
