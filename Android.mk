@@ -25,7 +25,9 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-v4 \
-    android-support-v7-recyclerview
+    android-support-v7-recyclerview \
+    plugcore_v1  
+    #add fota
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
     $(call all-java-files-under, WallpaperPicker/src) \
@@ -52,6 +54,12 @@ LOCAL_OVERRIDES_PACKAGES := Home Launcher2
 
 include $(BUILD_PACKAGE)
 
+#add fota
+include $(CLEAR_VARS)
+
+LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := plugcore_v1:libs/plugcore_v1_0327.jar
+
+include $(BUILD_MULTI_PREBUILT)
 
 #
 # Protocol Buffer Debug Utility in Java
@@ -89,5 +97,6 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/util/etc/launcher_protoutil | $(ACP)
 	$(hide) chmod 755 $@
 
 INTERNAL_DALVIK_MODULES += $(LOCAL_INSTALLED_MODULE)
+
 
 include $(call all-makefiles-under,$(LOCAL_PATH))

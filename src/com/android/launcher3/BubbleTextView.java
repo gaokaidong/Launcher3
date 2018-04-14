@@ -1,5 +1,4 @@
-/*
- * Copyright (C) 2008 The Android Open Source Project
+/* Copyright (C) 2008 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +42,8 @@ import android.widget.TextView;
 
 import com.android.launcher3.IconCache.IconLoadRequest;
 import com.android.launcher3.model.PackageItemInfo;
+
+import android.graphics.Color; //add by fota
 
 /**
  * TextView that draws a bubble behind the text. We cannot use a LineBackgroundSpan
@@ -98,13 +99,14 @@ public class BubbleTextView extends TextView
     private float mFastScrollFocusFraction;
     private boolean mFastScrollFocused;
     private final int mFastScrollMode = FAST_SCROLL_FOCUS_MODE_SCALE_ICON;
+    private final int mCustomIconSize = 150;
 
     private IconLoadRequest mIconLoadRequest;
+
 
     public BubbleTextView(Context context) {
         this(context, null, 0);
     }
-
     public BubbleTextView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
@@ -131,7 +133,7 @@ public class BubbleTextView extends TextView
         }
 
         mIconSize = a.getDimensionPixelSize(R.styleable.BubbleTextView_iconSizeOverride,
-                defaultIconSize);
+                mCustomIconSize);
 
         a.recycle();
 
@@ -402,6 +404,7 @@ public class BubbleTextView extends TextView
             super.draw(canvas);
             return;
         }
+
 
         // We enhance the shadow by drawing the shadow twice
         getPaint().setShadowLayer(SHADOW_LARGE_RADIUS, 0.0f, SHADOW_Y_OFFSET, SHADOW_LARGE_COLOUR);

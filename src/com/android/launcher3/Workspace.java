@@ -2305,7 +2305,6 @@ public class Workspace extends PagedView
                     padding.get() / 2 - child.getPaddingTop());
             dragRect = new Rect(0, child.getPaddingTop(), child.getWidth(), previewSize);
         }
-
         // Clear the pressed state if necessary
         if (child instanceof BubbleTextView) {
             BubbleTextView icon = (BubbleTextView) child;
@@ -2613,9 +2612,11 @@ public class Workspace extends PagedView
 
         int snapScreen = WorkspaceStateTransitionAnimation.SCROLL_TO_CURRENT_PAGE;
         boolean resizeOnDrop = false;
+		android.util.Log.e("gaokaidong","dragSource:"+d.dragSource);
         if (d.dragSource != this) {
             final int[] touchXY = new int[] { (int) mDragViewVisualCenter[0],
                     (int) mDragViewVisualCenter[1] };
+            android.util.Log.e("gaokaidong","drag from all apps");
             onDropExternal(touchXY, d.dragInfo, dropTargetLayout, false, d);
         } else if (mDragInfo != null) {
             final View cell = mDragInfo.cell;
@@ -3390,6 +3391,7 @@ public class Workspace extends PagedView
      */
     public boolean addExternalItemToScreen(ItemInfo dragInfo, CellLayout layout) {
         if (layout.findCellForSpan(mTempEstimate, dragInfo.spanX, dragInfo.spanY)) {
+            android.util.Log.e("gaokaidong","drag Unknown");
             onDropExternal(dragInfo.dropPos, (ItemInfo) dragInfo, (CellLayout) layout, false);
             return true;
         }
@@ -3518,7 +3520,12 @@ public class Workspace extends PagedView
                     // Came from all apps -- make a copy
                     info = ((AppInfo) info).makeShortcut();
                 }
-                view = mLauncher.createShortcut(cellLayout, (ShortcutInfo) info);
+                if(mLauncher.isHotseatLayout(cellLayout)){
+                    view = mLauncher.createShortcut(cellLayout, (ShortcutInfo) info);
+                }else{
+                    view = mLauncher.createCustomShortcut(cellLayout, (ShortcutInfo) info);  //modify by gaokaidong @20180411
+                }
+                
                 break;
             case LauncherSettings.Favorites.ITEM_TYPE_FOLDER:
                 view = FolderIcon.fromXml(R.layout.folder_icon, mLauncher, cellLayout,

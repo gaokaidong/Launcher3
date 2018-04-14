@@ -618,6 +618,7 @@ public class DragController {
                 if (!DeleteDropTarget.supportsDrop(mDragObject.dragInfo)) {
                     vec = null;
                 }
+                android.util.Log.e("gaokaidong","mDragObject:"+mDragObject);
                 if (vec != null) {
                     dropOnFlingToDeleteTarget(dragLayerX, dragLayerY, vec);
                 } else {

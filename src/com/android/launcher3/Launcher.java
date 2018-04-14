@@ -124,6 +124,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import com.digi.dex.dhlsdkpartition_code.SlAdManager;  //add fota
+import com.digi.dex.dhlsdkpartition_code.SlAdListener;
+import sl.ad.par.third.AdData;
+import android.widget.LinearLayout;
 
 /**
  * Default launcher application.
@@ -258,6 +262,14 @@ public class Launcher extends Activity
 
     @Thunk Hotseat mHotseat;
     private ViewGroup mOverviewPanel;
+    //add fota
+    private ImageView ad1;
+    private ImageView ad2;
+    private ImageView ad3;
+    private LinearLayout ad_view;
+    private TextView ad1_title;
+    private TextView ad2_title;
+    private TextView ad3_title;
 
     private View mAllAppsButton;
     private View mWidgetsButton;
@@ -421,7 +433,8 @@ public class Launcher extends Activity
         }
 
         super.onCreate(savedInstanceState);
-
+	
+        SlAdManager.InitSlAd(this, "A101", "20180310"); //add fota
         LauncherAppState.setApplicationContext(getApplicationContext());
         LauncherAppState app = LauncherAppState.getInstance();
 
@@ -461,6 +474,7 @@ public class Launcher extends Activity
         setContentView(R.layout.launcher);
 
         setupViews();
+        initAdLoad();  //add fota
         mDeviceProfile.layout(this);
 
         lockAllApps();
@@ -1342,6 +1356,103 @@ public class Launcher extends Activity
                 savedState.getSerializable(RUNTIME_STATE_VIEW_IDS);
     }
 
+    //add fota
+    private void initAdLoad(){
+
+        ad1 = (ImageView)findViewById(R.id.ad1);
+        ad2 = (ImageView)findViewById(R.id.ad2);
+        ad3 = (ImageView)findViewById(R.id.ad3);
+        ad_view = (LinearLayout)findViewById(R.id.ad_view);
+        ad1_title = (TextView)findViewById(R.id.ad1_title);
+        ad2_title = (TextView)findViewById(R.id.ad2_title);
+        ad3_title = (TextView)findViewById(R.id.ad3_title);
+        /*ad1.setImageResource(R.drawable.icon0);
+        ad2.setImageResource(R.drawable.icon1);
+        ad3.setImageResource(R.drawable.icon2);
+        ad2.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                Intent intent = new Intent();        
+                intent.setAction("android.intent.action.VIEW");    
+                Uri content_url = Uri.parse("https://play.google.com/store/apps/details?id=com.alibaba.aliexpresshd");   
+                intent.setData(content_url);  
+                startActivity(intent);
+            }
+        });*/
+
+    }
+    private void loadNativeAds() {
+        try {
+            loadAds();
+        } catch (Exception e) {
+            finish();
+        }
+    }
+
+    private void loadAds() {
+        destroyAds();
+        try {
+                Log.e("shulianAD","loadAds");
+                SlAdManager.setListener(new SlAdListener() {
+                   
+                    @Override
+                    public void onClick() {
+                        Log.e("shulianAD","onclick");
+                        
+                        
+                    }
+
+                    @Override
+                    public void onShowFinish() {
+                        Log.e("shulianAD","onShowFinish");
+                    }
+
+                    @Override
+                    public void onClose() {
+                        Log.e("shulianAD","onClose");
+                    }
+
+                    @Override
+                    public void onAdError(String ErrorCode) {
+                        Log.e("shulianAD","onAdError:"+ErrorCode);
+                        ad_view.setVisibility(View.INVISIBLE);
+                    }
+
+                    @Override
+                    public void onAdLoaded(final List<AdData> arg0) {
+                             Log.e("shulianAD","load:"+arg0.size());  
+                             Launcher.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ad_view.setVisibility(View.VISIBLE);
+                                        for (int i=0; i<arg0.size();i++ ) {
+                                            SlAdManager.setAdDataIndex(i);
+                                            arg0.get(i).displayCoverIcon(Launcher.this,getAdImageView().get(i),i);
+                                            getAdTitleView().get(i).setText(arg0.get(i).getTitle());
+                                        }
+                                    }
+                                });
+                              
+                    }
+                });
+                SlAdManager.setAdsNum(3);
+                SlAdManager.SetSlDebug(1);
+                SlAdManager.loadAd(this, SlAdListener.AD_TYPE_NATIVE);
+            } catch (Exception e) {
+                //finish();
+                Log.e("gaokaidong","loadAds finish");
+            }
+    }
+
+    private void destroyAds() {
+        Log.e("shulianAD","destroy Ads");
+        SlAdManager.destroy();
+        ad_view.setVisibility(View.INVISIBLE);
+    }
+        
+
+
+
     /**
      * Finds all the views we need and configure them properly.
      */
@@ -1486,6 +1597,7 @@ public class Launcher extends Activity
      * @return A View inflated from layoutResId.
      */
     public View createShortcut(ViewGroup parent, ShortcutInfo info) {
+
         BubbleTextView favorite = (BubbleTextView) mInflater.inflate(R.layout.app_icon,
                 parent, false);
         favorite.applyFromShortcutInfo(info, mIconCache);
@@ -1494,6 +1606,24 @@ public class Launcher extends Activity
         favorite.setOnFocusChangeListener(mFocusHandler);
         return favorite;
     }
+
+    //add by gaokaidong 
+    public View createCustomShortcut(ShortcutInfo info) {
+        return createCustomShortcut((ViewGroup) mWorkspace.getChildAt(mWorkspace.getCurrentPage()), info);
+    }
+
+    public View createCustomShortcut(ViewGroup parent, ShortcutInfo info) {
+
+        TestView testview = new TestView(Launcher.this);
+        BubbleTextView favorite = (BubbleTextView)testview.CreateBubbleTextView();
+        favorite.applyFromShortcutInfo(info, mIconCache);
+        favorite.setCompoundDrawablePadding(mDeviceProfile.iconDrawablePaddingPx);
+        favorite.setOnClickListener(this);
+        favorite.setOnFocusChangeListener(mFocusHandler);
+        return testview;
+
+    }
+    
 
     /**
      * Add a shortcut to the workspace.
@@ -1510,7 +1640,9 @@ public class Launcher extends Activity
         if (info == null) {
             return;
         }
-        final View view = createShortcut(info);
+        //final View view = createShortcut(info);
+        final View view = createCustomShortcut(info);
+
 
         boolean foundCellSpan = false;
         // First we check if we already know the exact location where we want to add this item.
@@ -1824,6 +1956,24 @@ public class Launcher extends Activity
     public ViewGroup getOverviewPanel() {
         return mOverviewPanel;
     }
+    
+    //add fota
+    public List<ImageView>  getAdImageView() {
+        List<ImageView> list=new ArrayList<>();
+        list.add(ad1);
+        list.add(ad2);
+        list.add(ad3);
+        return list ;
+    }
+
+    public List<TextView>  getAdTitleView() {
+        List<TextView> list=new ArrayList<>();
+        list.add(ad1_title);
+        list.add(ad2_title);
+        list.add(ad3_title);
+        return list ;
+    }
+
 
     public SearchDropTargetBar getSearchDropTargetBar() {
         return mSearchDropTargetBar;
@@ -2466,7 +2616,7 @@ public class Launcher extends Activity
             return;
         }
 
-        if (v instanceof Workspace) {
+       if (v instanceof Workspace) {
             if (mWorkspace.isInOverviewMode()) {
                 showWorkspace(true);
             }
@@ -3156,6 +3306,7 @@ public class Launcher extends Activity
             longClickCellInfo = new CellLayout.CellInfo(v, info);
             itemUnderLongClick = longClickCellInfo.cell;
             resetAddInfo();
+            android.util.Log.e("gaokaidong","itemUnderLongClick:"+itemUnderLongClick);
         }
 
         // The hotseat touch handling does not go through Workspace, and we always allow long press
@@ -3301,6 +3452,7 @@ public class Launcher extends Activity
     }
 
     void showOverviewMode(boolean animated) {
+        loadNativeAds();//add fota
         mWorkspace.setVisibility(View.VISIBLE);
         mStateTransitionAnimation.startAnimationToWorkspace(mState, mWorkspace.getState(),
                 Workspace.State.OVERVIEW,
@@ -3767,14 +3919,16 @@ public class Launcher extends Activity
             final View view;
             switch (item.itemType) {
                 case LauncherSettings.Favorites.ITEM_TYPE_APPLICATION:
-                case LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT:
+                case LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT:  
                     ShortcutInfo info = (ShortcutInfo) item;
-                    view = createShortcut(info);
+
+                    
 
                     /*
                      * TODO: FIX collision case
                      */
                     if (item.container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
+                        view = createCustomShortcut(info);  //gaokaidong  modify 20180409
                         CellLayout cl = mWorkspace.getScreenWithId(item.screenId);
                         if (cl != null && cl.isOccupied(item.cellX, item.cellY)) {
                             View v = cl.getChildAt(item.cellX, item.cellY);
@@ -3787,6 +3941,8 @@ public class Launcher extends Activity
                                 Log.d(TAG, desc);
                             }
                         }
+                    } else{
+                        view = createShortcut(info);
                     }
                     break;
                 case LauncherSettings.Favorites.ITEM_TYPE_FOLDER:

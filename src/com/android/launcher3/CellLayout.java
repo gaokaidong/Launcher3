@@ -616,6 +616,7 @@ public class CellLayout extends ViewGroup implements BubbleTextShadowHandler {
         if (child instanceof BubbleTextView) {
             BubbleTextView bubbleChild = (BubbleTextView) child;
             bubbleChild.setTextVisibility(!mIsHotseat);
+            
         }
 
         child.setScaleX(getChildrenScale());
@@ -632,12 +633,19 @@ public class CellLayout extends ViewGroup implements BubbleTextShadowHandler {
             child.setId(childId);
             mShortcutsAndWidgets.addView(child, index, lp);
 
+
             if (markCells) markCellsAsOccupiedForView(child);
 
             return true;
         }
         return false;
     }
+
+
+    //add by gaokaidong for shulian AD
+    public void addBubbleTextAD(BubbleTextView child){
+
+    } 
 
     @Override
     public void removeAllViews() {
